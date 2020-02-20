@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class LevelGrid : MonoBehaviour
 {
-    public int verticalSize;
-    public int horizontalSize;
+    int verticalSize;
+    int horizontalSize;
 
     public int tileSize = 64;
 
@@ -47,7 +47,8 @@ public class LevelGrid : MonoBehaviour
         GameObject tile = Instantiate(tileToSpawn);
         tile.transform.SetParent(gamePanel);
         tile.name = ("X: " + x + " " + "Y: " + y);
-        tile.transform.localPosition = new Vector3(x * (tileSize / 2), y * (tileSize / 2));
+        tile.transform.localScale = Vector3.one;
+        tile.transform.localPosition = new Vector3(x * tileSize - (horizontalSize / 2) + (tileSize / 2), y * tileSize - (verticalSize / 2) + (tileSize / 2));
     }
 
 }
