@@ -49,7 +49,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eda4f94414e1964686510972d8e4fff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectSprite: {fileID: 6148169518996105604}
+  objectImage: {fileID: 6148169518996105604}
+  objectSprites:
+  - {fileID: 21300000, guid: 9d0ef3c9b3f9cbe428313e24a77fd184, type: 3}
+  - {fileID: 21300000, guid: c0f3325445395d04ca2b9e0aa69860cd, type: 3}
+  - {fileID: 21300000, guid: f50ce83b987cf414b8ea6c8414f5fcf0, type: 3}
+  - {fileID: 21300000, guid: 908d5234ed3c56647845720c20f23957, type: 3}
+  - {fileID: 21300000, guid: 02d4cfadaafa7ae4e96ee7a4e995de52, type: 3}
   gridLocation: {fileID: 0}
   objectValue: 0
 --- !u!1 &6148169518996105602
@@ -110,7 +116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.28359774, g: 0.9528302, b: 0.27865788, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
