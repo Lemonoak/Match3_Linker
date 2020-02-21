@@ -14,11 +14,15 @@ public class LevelGrid : MonoBehaviour
     int rows; //this is horizontal
 
     public int[,] grid;
+    public List<Point> pointsList;
 
     public GameObject pointToSpawn;
     public GameObject tileToSpawn;
     public RectTransform gamePanel;
     public GameObject pointParent;
+
+    [SerializeField] bool isHeldDown = false;
+    [SerializeField] ConnectObject firstHitObject;
 
     private void Start()
     {
@@ -31,6 +35,11 @@ public class LevelGrid : MonoBehaviour
         InitializeGrid();
     }
 
+    private void Update()
+    {
+        SelectObject();
+    }
+
     void InitializeGrid()
     {
         grid = new int[columns, rows];
@@ -39,7 +48,15 @@ public class LevelGrid : MonoBehaviour
         {
             for (int j = 0; j < rows; j++)
             {
-                SpawnTiles(SpawnPoints(i, j));
+                pointsList.Add(SpawnPoints(i,j));
+            }
+        }
+
+        for (int i = 0; i < columns; i++)
+        {
+            for (int j = 0; j < rows; j++)
+            {
+                SpawnTiles(i, j, pointsList[j]);
             }
         }
     }
@@ -56,18 +73,40 @@ public class LevelGrid : MonoBehaviour
         return point.GetComponent<Point>();
     }
 
-    void SpawnTiles(Point point)
+    void SpawnTiles(int x, int y, Point point)
     {
         GameObject tile = Instantiate(tileToSpawn);
         tile.transform.SetParent(gamePanel.transform);
         tile.transform.localScale = Vector3.one;
-        tile.transform.localPosition = new Vector3(point.x * tileSize - (horizontalSize / 2) + (tileSize / 2), point.y * tileSize - (verticalSize / 2) + (tileSize / 2));
+        tile.transform.localPosition = new Vector3(x * tileSize - (horizontalSize / 2) + (tileSize / 2), y * tileSize - (verticalSize / 2) + (tileSize / 2));
         tile.GetComponent<ConnectObject>().SetTilePoint(point);
     }
 
     void SelectObject()
     {
-        //if(mouse.)
+        if(Input.GetMouseButtonDown(0))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
+            if(hit.collider != null)
+            {
+                isHeldDown = true;
+                Debug.Log(hit.collider.gameObject);
+                firstHitObject = hit.collider.gameObject.GetComponent<ConnectObject>();
+                if(firstHitObject != null)
+                {
+                    firstHitObject.isConnected = true;
+                }
+            }
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            if(firstHitObject != null)
+            {
+                firstHitObject.isConnected = false;
+                firstHitObject = null;
+            }
+            isHeldDown = false;
+        }
     }
 
 }

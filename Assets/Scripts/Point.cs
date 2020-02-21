@@ -8,7 +8,6 @@ public class Point : MonoBehaviour
     public int x;
     public int y;
     public bool isOccupied = false;
-    public bool isBlocker = false;
 
     public Point(int inX, int inY, bool inIsOccupied)
     {

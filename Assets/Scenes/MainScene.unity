@@ -1531,12 +1531,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileSize: 64
+  pointsList: []
   pointToSpawn: {fileID: 3612716494475960691, guid: 081421d7b58e97f4285baa2b93265598,
     type: 3}
   tileToSpawn: {fileID: 6148169517894051187, guid: 76e91d951b3c51444ab490e8289d1052,
     type: 3}
   gamePanel: {fileID: 1207901583}
   pointParent: {fileID: 1513071735}
+  isHeldDown: 0
+  firstHitObject: {fileID: 0}
 --- !u!4 &1567414879
 Transform:
   m_ObjectHideFlags: 0
