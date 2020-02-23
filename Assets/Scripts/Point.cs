@@ -9,10 +9,10 @@ public class Point : MonoBehaviour
     public int y;
     public bool isOccupied = false;
 
-    public Point(int inX, int inY, bool inIsOccupied)
-    {
-        x = inX;
-        y = inY;
-        isOccupied = inIsOccupied;
-    }
+    //public Point(int inX, int inY, bool inIsOccupied)
+    //{
+    //    x = inX;
+    //    y = inY;
+    //    isOccupied = inIsOccupied;
+    //}
 }
