@@ -22,7 +22,6 @@ public class LevelGrid : MonoBehaviour
     ConnectObject[] tilesPool = new ConnectObject[amountOfTiles];
     int tilesPoolFreeIndex = 0;
 
-
     public GameObject pointToSpawn;
     public GameObject tileToSpawn;
     public RectTransform gamePanel;
@@ -32,6 +31,7 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] ConnectObject firstHitObject;
     [SerializeField] int selectedObjectValue;
     public List<GameObject> selectedObjects;
+    ConnectObject lastObject = null;
 
     private void Start()
     {
@@ -53,6 +53,7 @@ public class LevelGrid : MonoBehaviour
     {
         grid = new int[columns, rows];
 
+        //Spawn the points
         for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
@@ -61,8 +62,10 @@ public class LevelGrid : MonoBehaviour
             }
         }
 
+        //spawn the pool of tiles
         SpawnTiles();
 
+        //place first points
         for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)
@@ -118,12 +121,12 @@ public class LevelGrid : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit2D hit = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
-            if(hit.collider != null)
+            if (hit.collider != null)
             {
                 isHeldDown = true;
                 Debug.Log(hit.collider.gameObject);
                 firstHitObject = hit.collider.gameObject.GetComponent<ConnectObject>();
-                if(firstHitObject != null)
+                if (firstHitObject != null)
                 {
                     firstHitObject.isConnected = true;
                     selectedObjects.Add(firstHitObject.gameObject);
@@ -131,21 +134,21 @@ public class LevelGrid : MonoBehaviour
                 }
             }
         }
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
-            if(firstHitObject != null && isHeldDown == true)
+            RaycastHit2D hit = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
+            if (firstHitObject != null && isHeldDown == true && hit.collider != null)
             {
-                RaycastHit2D hit = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
-                if (hit.collider != null)
+                ConnectObject newObject = hit.collider.gameObject.GetComponent<ConnectObject>();
+                if (newObject != null && newObject.objectValue == firstHitObject.objectValue)
                 {
-                    ConnectObject newObject = hit.collider.gameObject.GetComponent<ConnectObject>();
-                    if(newObject != null && firstHitObject != null && newObject.objectValue == firstHitObject.objectValue)
+                    if (lastObject == null)
+                        lastObject = firstHitObject;
+                    if (!selectedObjects.Contains(newObject.gameObject) && isTileNextTo(lastObject, newObject))
                     {
-                        if(!selectedObjects.Contains(newObject.gameObject))
-                        {
-                            newObject.isConnected = true;
-                            selectedObjects.Add(newObject.gameObject);
-                        }
+                        newObject.isConnected = true;
+                        selectedObjects.Add(newObject.gameObject);
+                        lastObject = selectedObjects[selectedObjects.Count - 1].GetComponent<ConnectObject>();
                     }
                 }
             }
@@ -153,10 +156,7 @@ public class LevelGrid : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             if (firstHitObject != null)
-            {
-                firstHitObject.isConnected = false;
                 firstHitObject = null;
-            }
             if (selectedObjects.Count >= 3)
             {
                 for (int i = 0; i < selectedObjects.Count; i++)
@@ -171,7 +171,38 @@ public class LevelGrid : MonoBehaviour
             }
             selectedObjects.Clear();
             isHeldDown = false;
+            lastObject = null;
         }
+    }
+
+    bool isTileNextTo(ConnectObject inLastObject, ConnectObject inNewObject)
+    {
+        if (inNewObject.gridLocation.x == inLastObject.gridLocation.x + 1 && //is the new tile up to the right?
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y + 1 ||
+
+            inNewObject.gridLocation.x == inLastObject.gridLocation.x + 1 && //right and down
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y - 1 ||
+
+            inNewObject.gridLocation.x == inLastObject.gridLocation.x - 1 && //left and up
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y + 1 ||
+
+            inNewObject.gridLocation.x == inLastObject.gridLocation.x - 1 && //left and down
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y - 1 || 
+
+            inNewObject.gridLocation.x == inLastObject.gridLocation.x + 1 && //right and same row
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y ||
+
+            inNewObject.gridLocation.x == inLastObject.gridLocation.x - 1 && //left and same row
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y ||
+
+            inNewObject.gridLocation.x == inLastObject.gridLocation.x &&
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y + 1 || //same column and up
+
+            inNewObject.gridLocation.x == inLastObject.gridLocation.x &&
+            inNewObject.gridLocation.y == inLastObject.gridLocation.y - 1)   //same column and down
+            return true;
+        else
+            return false;
     }
 
     public static LevelGrid GetInstance()
