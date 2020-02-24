@@ -28,6 +28,14 @@ public class ConnectObject : MonoBehaviour
         gridLocation = point;
     }
 
+    public Point GetTilePoint()
+    {
+        if (gridLocation != null)
+            return gridLocation;
+
+        return null;
+    }
+
     public void SetReactionAnimation(bool animationParam)
     {
         anim.SetBool("isConnected", animationParam);

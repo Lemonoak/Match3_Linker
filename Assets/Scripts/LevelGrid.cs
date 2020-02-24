@@ -18,7 +18,7 @@ public class LevelGrid : MonoBehaviour
     public int[,] grid;
     public List<Point> pointsList;
 
-    static int amountOfTiles = 100;
+    static int amountOfTiles = 150;
     ConnectObject[] tilesPool = new ConnectObject[amountOfTiles];
     int tilesPoolFreeIndex = 0;
 
@@ -34,6 +34,7 @@ public class LevelGrid : MonoBehaviour
 
     private void Start()
     {
+        //Find out what size to create the grid
         verticalSize = (int)gamePanel.rect.height;
         horizontalSize = (int)gamePanel.rect.width;
 
@@ -69,8 +70,8 @@ public class LevelGrid : MonoBehaviour
         {
             for (int y = 0; y < rows; y++)
             {
-                //place tile at point i and j (x and y) and pass in pointList[j or HOW DO I FIND THE CORRECT POINT WHEN I HAVE i and j]?
-                PlaceTile(pointsList[(x * columns) + y], x, y);
+                //place tile at point x and y and pass in the correct position
+                PlaceStartTiles(pointsList[(x * columns) + y]);
             }
         }
 
@@ -100,13 +101,15 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
-    void PlaceTile(Point point, int x, int y)
+    void PlaceStartTiles(Point point)
     {
         if (tilesPoolFreeIndex < tilesPool.Length)
         {
-            tilesPool[tilesPoolFreeIndex].transform.localPosition = new Vector3(x * tileSize - (horizontalSize / 2) + (tileSize / 2), y * tileSize - (verticalSize / 2) + (tileSize / 2));
-            tilesPool[tilesPoolFreeIndex].gameObject.SetActive(true);
             tilesPool[tilesPoolFreeIndex].SetTilePoint(point);
+            tilesPool[tilesPoolFreeIndex].gridLocation.tile = tilesPool[tilesPoolFreeIndex];
+            tilesPool[tilesPoolFreeIndex].gridLocation.isOccupied = true;
+            tilesPool[tilesPoolFreeIndex].transform.localPosition = new Vector3(point.x * tileSize - (horizontalSize / 2) + (tileSize / 2), point.y * tileSize - (verticalSize / 2) + (tileSize / 2));
+            tilesPool[tilesPoolFreeIndex].gameObject.SetActive(true);
             tilesPoolFreeIndex++;
             if (tilesPoolFreeIndex >= tilesPool.Length)
             {
@@ -143,7 +146,7 @@ public class LevelGrid : MonoBehaviour
                 {
                     if (lastObject == null)
                         lastObject = firstHitObject;
-                    if (!selectedObjects.Contains(newObject.gameObject) && isTileNextTo(lastObject, newObject))
+                    if (!selectedObjects.Contains(newObject.gameObject) && IsTileNextTo(lastObject, newObject))
                     {
                         newObject.isConnected = true;
                         newObject.SetReactionAnimation(true);
@@ -155,29 +158,39 @@ public class LevelGrid : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(0))
         {
-            if (firstHitObject != null)
-                firstHitObject = null;
+            //if player have selected 3 or more objects
             if (selectedObjects.Count >= 3)
             {
                 for (int i = 0; i < selectedObjects.Count; i++)
                 {
                     selectedObjects[i].GetComponent<ConnectObject>().isConnected = false;
+                    selectedObjects[i].GetComponent<ConnectObject>().gridLocation.isOccupied = false;
+                    selectedObjects[i].GetComponent<ConnectObject>().SetReactionAnimation(false);
                     selectedObjects[i].SetActive(false);
+                }
+                selectedObjects.Clear();
+                TilesFall();
+            }
+            //if player have selected less than 3 objects
+            else
+            {
+                for (int i = 0; i < selectedObjects.Count; i++)
+                {
+                    selectedObjects[i].GetComponent<ConnectObject>().isConnected = false;
                     selectedObjects[i].GetComponent<ConnectObject>().SetReactionAnimation(false);
                 }
+                selectedObjects.Clear();
             }
-            for (int i = 0; i < selectedObjects.Count; i++)
-            {
-                selectedObjects[i].GetComponent<ConnectObject>().isConnected = false;
-                selectedObjects[i].GetComponent<ConnectObject>().SetReactionAnimation(false);
-            }
+
             selectedObjects.Clear();
             isHeldDown = false;
             lastObject = null;
+            if (firstHitObject != null)
+                firstHitObject = null;
         }
     }
 
-    bool isTileNextTo(ConnectObject inLastObject, ConnectObject inNewObject)
+    bool IsTileNextTo(ConnectObject inLastObject, ConnectObject inNewObject)
     {
         if (inNewObject.gridLocation.x == inLastObject.gridLocation.x + 1 && //is the new tile up to the right?
             inNewObject.gridLocation.y == inLastObject.gridLocation.y + 1 ||
@@ -205,6 +218,37 @@ public class LevelGrid : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    void TilesFall()
+    {
+        for (int x = 0; x < columns; x++)
+        {
+            ConnectObject tileToMove;
+            int spacesToMove = 0;
+            for (int y = 0; y < rows; y++)
+            {
+                if (!pointsList[(x * columns) + y].isOccupied)
+                    spacesToMove++;
+                else
+                {
+                    tileToMove = pointsList[(x * columns) + y].tile;
+                    MoveTile(tileToMove, pointsList[(x * columns) + y - spacesToMove]);
+                }
+            }
+        }
+    }
+
+    void MoveTile(ConnectObject tileToMove, Point newPoint)
+    {
+        //clear references of tile and point
+        tileToMove.GetTilePoint().isOccupied = false;
+        tileToMove.GetTilePoint().tile = null;
+        //set new references
+        tileToMove.SetTilePoint(newPoint);
+        newPoint.tile = tileToMove;
+        newPoint.isOccupied = true;
+        tileToMove.transform.localPosition = new Vector3(newPoint.x * tileSize - (horizontalSize / 2) + (tileSize / 2), newPoint.y * tileSize - (verticalSize / 2) + (tileSize / 2));
     }
 
     public static LevelGrid GetInstance()

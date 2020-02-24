@@ -9,10 +9,22 @@ public class Point : MonoBehaviour
     public int y;
     public bool isOccupied = false;
 
-    //public Point(int inX, int inY, bool inIsOccupied)
-    //{
-    //    x = inX;
-    //    y = inY;
-    //    isOccupied = inIsOccupied;
-    //}
+    public ConnectObject tile;
+
+    public Image sprite;
+
+
+//#if (UNITY_EDITOR)
+//    private void Update()
+//    {
+//        if(isOccupied)
+//        {
+//            sprite.color = Color.red;
+//        }
+//        else
+//        {
+//            sprite.color = Color.green;
+//        }
+//    }
+//#endif
 }

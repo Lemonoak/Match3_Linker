@@ -125,4 +125,5 @@ MonoBehaviour:
   x: 0
   y: 0
   isOccupied: 0
-  isBlocker: 0
+  tile: {fileID: 0}
+  sprite: {fileID: 1384759369037363764}
