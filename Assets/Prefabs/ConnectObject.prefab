@@ -58,6 +58,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: f50ce83b987cf414b8ea6c8414f5fcf0, type: 3}
   - {fileID: 21300000, guid: 908d5234ed3c56647845720c20f23957, type: 3}
   - {fileID: 21300000, guid: 02d4cfadaafa7ae4e96ee7a4e995de52, type: 3}
+  anim: {fileID: 4526929207520348367}
   gridLocation: {fileID: 0}
   objectValue: 0
   isConnected: 0
@@ -85,7 +86,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 64, y: 64}
+  m_Size: {x: 40, y: 40}
   m_EdgeRadius: 0
 --- !u!95 &4526929207520348367
 Animator:

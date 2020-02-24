@@ -7,6 +7,7 @@ public class ConnectObject : MonoBehaviour
 {
     public Image objectImage;
     public Sprite[] objectSprites;
+    public Animator anim;
 
     public Point gridLocation;
     public int objectValue = 0; //This represents what type of object it is, 0 = Circle, 1 = Cube, 2 = Diamond, 3 = Star, 4 == Triangle
@@ -25,5 +26,10 @@ public class ConnectObject : MonoBehaviour
     public void SetTilePoint(Point point)
     {
         gridLocation = point;
+    }
+
+    public void SetReactionAnimation(bool animationParam)
+    {
+        anim.SetBool("isConnected", animationParam);
     }
 }

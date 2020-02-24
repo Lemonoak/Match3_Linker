@@ -29,7 +29,6 @@ public class LevelGrid : MonoBehaviour
 
     [SerializeField] bool isHeldDown = false;
     [SerializeField] ConnectObject firstHitObject;
-    [SerializeField] int selectedObjectValue;
     public List<GameObject> selectedObjects;
     ConnectObject lastObject = null;
 
@@ -130,7 +129,7 @@ public class LevelGrid : MonoBehaviour
                 {
                     firstHitObject.isConnected = true;
                     selectedObjects.Add(firstHitObject.gameObject);
-                    selectedObjectValue = firstHitObject.objectValue;
+                    firstHitObject.SetReactionAnimation(true);
                 }
             }
         }
@@ -147,6 +146,7 @@ public class LevelGrid : MonoBehaviour
                     if (!selectedObjects.Contains(newObject.gameObject) && isTileNextTo(lastObject, newObject))
                     {
                         newObject.isConnected = true;
+                        newObject.SetReactionAnimation(true);
                         selectedObjects.Add(newObject.gameObject);
                         lastObject = selectedObjects[selectedObjects.Count - 1].GetComponent<ConnectObject>();
                     }
@@ -163,11 +163,13 @@ public class LevelGrid : MonoBehaviour
                 {
                     selectedObjects[i].GetComponent<ConnectObject>().isConnected = false;
                     selectedObjects[i].SetActive(false);
+                    selectedObjects[i].GetComponent<ConnectObject>().SetReactionAnimation(false);
                 }
             }
             for (int i = 0; i < selectedObjects.Count; i++)
             {
                 selectedObjects[i].GetComponent<ConnectObject>().isConnected = false;
+                selectedObjects[i].GetComponent<ConnectObject>().SetReactionAnimation(false);
             }
             selectedObjects.Clear();
             isHeldDown = false;
