@@ -11,7 +11,7 @@ public class Point : MonoBehaviour
 
     public ConnectObject tile;
 
-    public Image sprite;
+    //public Image sprite;
 
 
 //#if (UNITY_EDITOR)
