@@ -9,7 +9,7 @@ public class Point : MonoBehaviour
     public int y;
     public bool isOccupied = false;
 
-    public ConnectObject tile;
+    public Tile tile;
 
     //public Image sprite;
 
