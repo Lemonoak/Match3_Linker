@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour
     int columns; //vertical
     int rows; //horizontal
 
-    int[,] grid;
     List<Point> pointsList = new List<Point>();
 
     [Header("Tiles Pool")]
@@ -63,8 +62,6 @@ public class GameManager : MonoBehaviour
 
     void InitializeGrid()
     {
-        grid = new int[columns, rows];
-
         //Spawn the points
         for (int x = 0; x < columns; x++)
         {
