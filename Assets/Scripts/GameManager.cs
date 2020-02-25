@@ -29,9 +29,12 @@ public class GameManager : MonoBehaviour
     public GameObject tileToSpawn;
     public RectTransform gamePanel;
     public GameObject pointParent;
+
+    [Header("Tile fall properties")]
     [Tooltip("The speed that tiles fall at")]
     public float tileFallSpeed = 10.0f;
     public float tileFallMaxTime = 1.0f;
+    public AnimationCurve tileFallCurve;
 
     [Header("RunTime Debugging properties")]
     [SerializeField] Tile firstHitObject;
@@ -261,8 +264,9 @@ public class GameManager : MonoBehaviour
         while(timeToMove < tileFallMaxTime)
         {
             Vector3 startPos = tileToMove.transform.localPosition;
-            tileToMove.transform.localPosition = Vector3.Lerp(startPos ,new Vector3(newPoint.x * tileSize - (horizontalSize / 2) + (tileSize / 2), newPoint.y * tileSize - (verticalSize / 2) + (tileSize / 2)), (timeToMove / tileFallMaxTime));
             timeToMove += Time.deltaTime * tileFallSpeed;
+            float curvePercent = tileFallCurve.Evaluate(timeToMove / tileFallMaxTime);
+            tileToMove.transform.localPosition = Vector3.Lerp(startPos, new Vector3(newPoint.x * tileSize - (horizontalSize / 2) + (tileSize / 2), newPoint.y * tileSize - (verticalSize / 2) + (tileSize / 2)), curvePercent);
             yield return null;
         }
     }
