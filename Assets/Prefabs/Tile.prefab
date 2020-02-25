@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c04d5d6a3f2bf4eb0b8d4a56e65e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectImage: {fileID: 6148169518996105604}
+  tileImage: {fileID: 6148169518996105604}
   objectSprites:
   - {fileID: 21300000, guid: 9d0ef3c9b3f9cbe428313e24a77fd184, type: 3}
   - {fileID: 21300000, guid: c0f3325445395d04ca2b9e0aa69860cd, type: 3}

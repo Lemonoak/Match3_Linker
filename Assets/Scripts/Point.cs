@@ -11,20 +11,20 @@ public class Point : MonoBehaviour
 
     public Tile tile;
 
-    //public Image sprite;
+    public Image sprite;
 
 
-//#if (UNITY_EDITOR)
-//    private void Update()
-//    {
-//        if(isOccupied)
-//        {
-//            sprite.color = Color.red;
-//        }
-//        else
-//        {
-//            sprite.color = Color.green;
-//        }
-//    }
-//#endif
+#if (UNITY_EDITOR)
+    private void Update()
+    {
+        if (isOccupied)
+        {
+            sprite.color = Color.red;
+        }
+        else
+        {
+            sprite.color = Color.green;
+        }
+    }
+#endif
 }

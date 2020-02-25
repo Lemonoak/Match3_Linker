@@ -20,9 +20,9 @@ public class GameManager : MonoBehaviour
     List<Point> pointsList = new List<Point>();
 
     [Header("Tiles Pool")]
-    static int amountOfTiles = 150; //How many tiles should spawn for the pool
+    static int amountOfTiles = 100; //How many tiles should spawn for the pool
     Tile[] tilesPool = new Tile[amountOfTiles];
-    int tilesPoolFreeIndex = 0;
+    public int tilesPoolFreeIndex = 0;
 
     [Header("Spawning Properties")]
     public GameObject pointToSpawn;
@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        RespawnTiles();
         SelectObject();
     }
 
@@ -108,7 +109,7 @@ public class GameManager : MonoBehaviour
             tilesPool[i].transform.SetParent(gamePanel.transform);
             tilesPool[i].transform.localScale = Vector3.one;
             tilesPool[i].name = "Tile " + i.ToString();
-            tilesPool[i].gameObject.SetActive(false);
+            tilesPool[i].SetTileActive(false);
         }
     }
 
@@ -120,12 +121,10 @@ public class GameManager : MonoBehaviour
             tilesPool[tilesPoolFreeIndex].gridLocation.tile = tilesPool[tilesPoolFreeIndex];
             tilesPool[tilesPoolFreeIndex].gridLocation.isOccupied = true;
             tilesPool[tilesPoolFreeIndex].transform.localPosition = new Vector3(point.x * tileSize - (horizontalSize / 2) + (tileSize / 2), point.y * tileSize - (verticalSize / 2) + (tileSize / 2));
-            tilesPool[tilesPoolFreeIndex].gameObject.SetActive(true);
+            tilesPool[tilesPoolFreeIndex].SetTileActive(true);
             tilesPoolFreeIndex++;
             if (tilesPoolFreeIndex >= tilesPool.Length)
-            {
                 tilesPoolFreeIndex = 0;
-            }
         }
     }
 
@@ -173,10 +172,11 @@ public class GameManager : MonoBehaviour
             {
                 for (int i = 0; i < selectedObjects.Count; i++)
                 {
-                    selectedObjects[i].GetComponent<Tile>().isConnected = false;
-                    selectedObjects[i].GetComponent<Tile>().gridLocation.isOccupied = false;
-                    selectedObjects[i].GetComponent<Tile>().SetReactionAnimation(false);
-                    selectedObjects[i].SetActive(false);
+                    Tile tileInQuestion = selectedObjects[i].GetComponent<Tile>();
+                    tileInQuestion.isConnected = false;
+                    tileInQuestion.gridLocation.isOccupied = false;
+                    tileInQuestion.SetReactionAnimation(false);
+                    tileInQuestion.SetTileActive(false);
                 }
                 selectedObjects.Clear();
                 TilesFall();
@@ -251,9 +251,13 @@ public class GameManager : MonoBehaviour
 
     IEnumerator MoveTile(Tile tileToMove, Point newPoint)
     {
-        //clear references of tile and point
-        tileToMove.GetTilePoint().isOccupied = false;
-        tileToMove.GetTilePoint().tile = null;
+        //clear references of tile and point to say that point is not occupied and make sure that tile wont go back to the point it had before
+        if(tileToMove.GetTilePoint() != null)
+        {
+            tileToMove.GetTilePoint().isOccupied = false;
+            tileToMove.GetTilePoint().tile = null;
+            tileToMove.SetTilePoint(null);
+        }
         //set new references
         tileToMove.SetTilePoint(newPoint);
         newPoint.tile = tileToMove;
@@ -269,6 +273,56 @@ public class GameManager : MonoBehaviour
             tileToMove.transform.localPosition = Vector3.Lerp(startPos, new Vector3(newPoint.x * tileSize - (horizontalSize / 2) + (tileSize / 2), newPoint.y * tileSize - (verticalSize / 2) + (tileSize / 2)), curvePercent);
             yield return null;
         }
+    }
+
+    void RespawnTiles()
+    {
+        for (int x = 0; x < columns; x++)
+        {
+            //Check all the tiles at the top of the game
+            if (!pointsList[(x * columns) + rows - 1].isOccupied)
+            {
+                Tile tileToSpawn = FindFirstDisabledTile();
+                if(tileToSpawn != null)
+                {
+                    //set the tile point to one above the top row
+                    tileToSpawn.transform.localPosition = new Vector3(pointsList[(x * columns) + rows - 1].x * tileSize - (horizontalSize / 2) + (tileSize / 2), (pointsList[(x * columns) + rows - 1].y + 1) * tileSize - (verticalSize / 2) + (tileSize / 2));
+                    //set the tile point to the top point that it should fall down to
+                    tileToSpawn.SetTilePoint(pointsList[(x * columns) + (rows - 1)]);
+                    tileToSpawn.SetTileActive(true);
+                    StartCoroutine(MoveTile(tileToSpawn, pointsList[(x * columns) + (rows - 1)]));
+                    //Make tile fall properly into the right spot
+                    TilesFall();
+                }
+            }
+        }
+    }
+
+    Tile FindFirstDisabledTile()
+    {
+        Tile tileToReturn = null;
+        for (int i = tilesPoolFreeIndex; i < tilesPool.Length; i++)
+        {
+            if (tilesPool[tilesPoolFreeIndex].GetTileActive())
+            {
+                tilesPoolFreeIndex++;
+                if (tilesPoolFreeIndex >= tilesPool.Length)
+                    tilesPoolFreeIndex = 0;
+
+                continue;
+            }
+            else
+            {
+                tileToReturn = tilesPool[tilesPoolFreeIndex];
+                tilesPoolFreeIndex++;
+                if (tilesPoolFreeIndex >= tilesPool.Length)
+                    tilesPoolFreeIndex = 0;
+
+                return tileToReturn;
+            }
+        }
+
+        return tileToReturn;
     }
 
     public static GameManager GetInstance()
