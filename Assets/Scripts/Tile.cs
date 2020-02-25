@@ -44,6 +44,7 @@ public class Tile : MonoBehaviour
     public void Respawn(Point point)
     {
         SetTilePoint(point);
+        //randomize tile object
         objectValue = Random.Range(0, objectSprites.Length);
         if (objectSprites.Length > 0)
             tileImage.sprite = objectSprites[objectValue];

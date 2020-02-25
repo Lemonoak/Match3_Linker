@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
         //spawn the pool of tiles
         SpawnTiles();
 
-        //place first points
+        //place first tiles
         for (int x = 0; x < columns; x++)
         {
             for (int y = 0; y < rows; y++)

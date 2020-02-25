@@ -521,6 +521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileSize: 64
+  tilesPoolFreeIndex: 0
   pointToSpawn: {fileID: 3612716494475960691, guid: 081421d7b58e97f4285baa2b93265598,
     type: 3}
   tileToSpawn: {fileID: 6148169517894051187, guid: 76e91d951b3c51444ab490e8289d1052,
