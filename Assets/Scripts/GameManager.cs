@@ -31,14 +31,14 @@ public class GameManager : MonoBehaviour
 
     [Header("Tile fall properties")]
     [Tooltip("The speed that tiles fall at")]
-    public float tileFallSpeed = 10.0f;
+    public float tileFallSpeed = 1.0f;
     public float tileFallMaxTime = 1.0f;
     public AnimationCurve tileFallCurve;
 
     [Header("RunTime Debugging properties")]
-    [SerializeField] Tile firstHitObject;
-    public List<GameObject> selectedObjects;
-    Tile lastObject = null;
+    [SerializeField] Tile firstHitTile;
+    public List<GameObject> selectedTiles;
+    Tile lastTile = null;
 
     bool isHeldDown = false;
 
@@ -83,7 +83,6 @@ public class GameManager : MonoBehaviour
                 PlaceStartTiles(pointsList[(x * columns) + y]);
             }
         }
-
     }
 
     Point SpawnPoints(int x, int y)
@@ -127,101 +126,104 @@ public class GameManager : MonoBehaviour
 
     void SelectObject()
     {
+        //select first tile
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit2D hit = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
             if (hit.collider != null)
             {
                 isHeldDown = true;
-                firstHitObject = hit.collider.gameObject.GetComponent<Tile>();
-                if (firstHitObject != null)
+                firstHitTile = hit.collider.gameObject.GetComponent<Tile>();
+                if (firstHitTile != null)
                 {
-                    firstHitObject.isConnected = true;
-                    selectedObjects.Add(firstHitObject.gameObject);
-                    firstHitObject.SetReactionAnimation(true);
+                    firstHitTile.isConnected = true;
+                    selectedTiles.Add(firstHitTile.gameObject);
+                    firstHitTile.SetReactionAnimation(true);
                 }
             }
         }
+        //find tiles after first tile
         if (Input.GetMouseButton(0))
         {
             RaycastHit2D hit = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
-            if (firstHitObject != null && isHeldDown == true && hit.collider != null)
+            if (firstHitTile != null && isHeldDown == true && hit.collider != null)
             {
                 Tile newObject = hit.collider.gameObject.GetComponent<Tile>();
-                if (newObject != null && newObject.objectValue == firstHitObject.objectValue)
+                if (newObject != null && newObject.objectValue == firstHitTile.objectValue)
                 {
-                    if (lastObject == null)
-                        lastObject = firstHitObject;
-                    if (!selectedObjects.Contains(newObject.gameObject) && IsTileNextTo(lastObject, newObject))
+                    if (lastTile == null)
+                        lastTile = firstHitTile;
+                    if (!selectedTiles.Contains(newObject.gameObject) && IsTileNextTo(lastTile, newObject))
                     {
                         newObject.isConnected = true;
                         newObject.SetReactionAnimation(true);
-                        selectedObjects.Add(newObject.gameObject);
-                        lastObject = selectedObjects[selectedObjects.Count - 1].GetComponent<Tile>();
+                        selectedTiles.Add(newObject.gameObject);
+                        lastTile = selectedTiles[selectedTiles.Count - 1].GetComponent<Tile>();
                     }
                 }
             }
         }
+        //player finished selecting tiles
         if (Input.GetMouseButtonUp(0))
         {
-            //if player have selected 3 or more objects
-            if (selectedObjects.Count >= 3)
+            //if player have selected 3 or more tiles
+            if (selectedTiles.Count >= 3)
             {
-                for (int i = 0; i < selectedObjects.Count; i++)
+                for (int i = 0; i < selectedTiles.Count; i++)
                 {
-                    Tile tileInQuestion = selectedObjects[i].GetComponent<Tile>();
+                    Tile tileInQuestion = selectedTiles[i].GetComponent<Tile>();
                     tileInQuestion.isConnected = false;
                     tileInQuestion.gridLocation.isOccupied = false;
                     tileInQuestion.SetReactionAnimation(false);
                     tileInQuestion.SetTileActive(false);
                 }
-                selectedObjects.Clear();
+                selectedTiles.Clear();
                 TilesFall();
             }
-            //if player have selected less than 3 objects
+            //if player have selected less than 3 tiles
             else
             {
-                for (int i = 0; i < selectedObjects.Count; i++)
+                for (int i = 0; i < selectedTiles.Count; i++)
                 {
-                    selectedObjects[i].GetComponent<Tile>().isConnected = false;
-                    selectedObjects[i].GetComponent<Tile>().SetReactionAnimation(false);
+                    selectedTiles[i].GetComponent<Tile>().isConnected = false;
+                    selectedTiles[i].GetComponent<Tile>().SetReactionAnimation(false);
                 }
-                selectedObjects.Clear();
+                selectedTiles.Clear();
             }
 
-            selectedObjects.Clear();
+            selectedTiles.Clear();
             isHeldDown = false;
-            lastObject = null;
-            if (firstHitObject != null)
-                firstHitObject = null;
+            lastTile = null;
+            if (firstHitTile != null)
+                firstHitTile = null;
         }
     }
 
-    bool IsTileNextTo(Tile inLastObject, Tile inNewObject)
+    bool IsTileNextTo(Tile inLastTile, Tile inNewTile)
     {
-        if (inNewObject.gridLocation.x == inLastObject.gridLocation.x + 1 && //is the new tile up to the right?
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y + 1 ||
+        if (inNewTile.gridLocation.x == inLastTile.gridLocation.x + 1 && //is the new tile up to the right?
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y + 1 ||
 
-            inNewObject.gridLocation.x == inLastObject.gridLocation.x + 1 && //right and down
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y - 1 ||
+            inNewTile.gridLocation.x == inLastTile.gridLocation.x + 1 && //right and down
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y - 1 ||
 
-            inNewObject.gridLocation.x == inLastObject.gridLocation.x - 1 && //left and up
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y + 1 ||
+            inNewTile.gridLocation.x == inLastTile.gridLocation.x - 1 && //left and up
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y + 1 ||
 
-            inNewObject.gridLocation.x == inLastObject.gridLocation.x - 1 && //left and down
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y - 1 ||
+            inNewTile.gridLocation.x == inLastTile.gridLocation.x - 1 && //left and down
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y - 1 ||
 
-            inNewObject.gridLocation.x == inLastObject.gridLocation.x + 1 && //right and same row
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y ||
+            inNewTile.gridLocation.x == inLastTile.gridLocation.x + 1 && //right and same row
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y ||
 
-            inNewObject.gridLocation.x == inLastObject.gridLocation.x - 1 && //left and same row
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y ||
+            inNewTile.gridLocation.x == inLastTile.gridLocation.x - 1 && //left and same row
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y ||
 
-            inNewObject.gridLocation.x == inLastObject.gridLocation.x &&
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y + 1 || //same column and up
+            inNewTile.gridLocation.x == inLastTile.gridLocation.x &&
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y + 1 || //same column and up
 
-            inNewObject.gridLocation.x == inLastObject.gridLocation.x &&
-            inNewObject.gridLocation.y == inLastObject.gridLocation.y - 1)   //same column and down
+            inNewTile.gridLocation.x == inLastTile.gridLocation.x &&
+            inNewTile.gridLocation.y == inLastTile.gridLocation.y - 1)   //same column and down
             return true;
         else
             return false;
